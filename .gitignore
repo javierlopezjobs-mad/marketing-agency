@@ -5,8 +5,10 @@ __pycache__/
 venv/
 .venv/
 .env
+!.env.example
 *.egg-info/
 dist/
 build/
 .pytest_cache/
-.vscode/
+.vscode/*
+!.vscode/launch.json

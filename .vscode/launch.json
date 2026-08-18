@@ -1,0 +1,39 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Crew (args)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main_crew.py",
+            "args": ["The rise of AI agents in modern workplaces"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "python": "${workspaceFolder}/../crewai-env/bin/python"
+        },
+        {
+            "name": "Run Crew (prompt)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main_crew.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/.env",
+            "python": "${workspaceFolder}/../crewai-env/bin/python"
+        },
+        {
+            "name": "Run Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["tests/", "-v"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "OPENAI_API_KEY": "test-key"
+            },
+            "python": "${workspaceFolder}/../crewai-env/bin/python"
+        }
+    ]
+}
