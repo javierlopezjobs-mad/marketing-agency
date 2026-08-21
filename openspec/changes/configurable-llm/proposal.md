@@ -28,6 +28,6 @@ The model is hardcoded (`openai/gpt-4o-mini` in `src/config.py`) and the pipelin
 ## Impact
 
 - **Code**: `src/config.py` (rewritten config loading); `.env.example`; tests in `tests/test_crew.py` covering config behavior.
-- **Dependencies**: none added — CrewAI's `LLM` already routes via LiteLLM to all supported providers.
+- **Dependencies**: none added — CrewAI routes common providers natively (OpenRouter, Ollama, DeepSeek, vLLM, …); niche providers need optional extras (`litellm` for Groq, `crewai[google-genai]` for Gemini), documented in `.env.example`.
 - **Compatibility**: existing `.env` files with only `OPENAI_API_KEY` keep working unchanged.
 - **Specs**: modifies the `post-publisher-crew` capability (builds on the in-flight `add-post-publisher-crew` change).

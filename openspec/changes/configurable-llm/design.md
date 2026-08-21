@@ -2,7 +2,7 @@
 
 ## Context
 
-`src/config.py` builds a module-level CrewAI `LLM` singleton at import time with a hardcoded `openai/gpt-4o-mini` model and a mandatory `OPENAI_API_KEY`. `src/agents.py` imports this singleton; nothing else touches LLM construction. CrewAI's `LLM` is a LiteLLM wrapper, so provider routing (OpenRouter, Groq, Gemini, Ollama, custom OpenAI-compatible endpoints) already works through the model-string prefix and optional `base_url` — no new dependencies are needed.
+`src/config.py` builds a module-level CrewAI `LLM` singleton at import time with a hardcoded `openai/gpt-4o-mini` model and a mandatory `OPENAI_API_KEY`. `src/agents.py` imports this singleton; nothing else touches LLM construction. CrewAI's `LLM` routes models through built-in native providers (openai, openrouter, ollama, deepseek, hosted_vllm, cerebras, …) plus optional `base_url`; other providers require opt-in extras (`litellm` for e.g. Groq, `crewai[google-genai]` for Gemini) — verified against the installed version. No new dependencies are required for the scenarios in scope.
 
 Constraint: tests reload `src.config` under patched env vars, so import-time configuration must stay cheap and deterministic.
 
@@ -23,7 +23,7 @@ Constraint: tests reload `src.config` under patched env vars, so import-time con
 ### 1. Generic env vars with legacy fallback
 `LLM_MODEL`, `LLM_API_KEY`, `LLM_BASE_URL`, `LLM_TEMPERATURE`; key resolution order: `LLM_API_KEY` → `OPENAI_API_KEY`.
 
-*Why not provider-specific vars (`OPENROUTER_API_KEY`, etc.)?* LiteLLM already reads those natively for most providers; a single generic pair keeps our surface minimal while provider-native vars keep working as a bonus path.
+*Why not provider-specific vars (`OPENROUTER_API_KEY`, etc.)?* A single generic pair keeps our surface minimal; provider-native env vars still work where the underlying client supports them.
 
 ### 2. Conditional key validation instead of unconditional raise
 Raise `ValueError` only when: no key is resolvable AND the setup needs one — i.e. model is not `ollama/*` and `LLM_BASE_URL` is unset. Message names the missing variable (`LLM_API_KEY not set`).
@@ -43,6 +43,7 @@ No `LLM_MODEL` → `openai/gpt-4o-mini`. Guarantees backward compatibility for c
 ## Risks / Trade-offs
 
 - [Free-tier rate limits break long crew runs] → Document limits in `.env.example`; retry/queueing is out of scope.
+- [Some providers need optional extras (Groq via `litellm`, Gemini via `crewai[google-genai]`)] → Documented in `.env.example`; installing an extra is a one-line change, not a code change.
 - [Typo in `LLM_MODEL` fails late with an obscure LiteLLM error] → Acceptable; document common prefixes in `.env.example`.
 - [Import-time validation makes some tests env-sensitive] → Follow existing `patch.dict(os.environ)` + `reload` test pattern.
 - [Delta modifies a requirement from an unarchived change] → Delta text is self-contained; archive `add-post-publisher-crew` first when syncing specs.
